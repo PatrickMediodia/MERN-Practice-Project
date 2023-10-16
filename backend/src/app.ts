@@ -1,20 +1,14 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
-import NoteModel from "./models/note";
+import notesRoutes from "./routes/notes";
 
 const app = express();
 
-//express infers that req and res that why no need to declare even though using TS
-//no need to use try catch if it is synchronous/non-async code
-app.get("/", async (req, res, next) => {
-    try {
-        //throw Error("This is a new error!");
-        const notes = await NoteModel.find().exec();
-        res.status(200).json(notes);
-    } catch(error) {
-        next(error)
-    }
-});
+//sets up expres so that it accepts json bodies, lets us send json on POST
+app.use(express.json());
+
+//adds the notes router to the app
+app.use("/api/notes", notesRoutes);
 
 //this middleware is hit if the endpoint does not exist
 app.use((req, res, next) => {
