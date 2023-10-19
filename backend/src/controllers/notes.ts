@@ -67,3 +67,50 @@ export const createNote: RequestHandler<unknown, unknown, CreateNoteBody, unknow
         next(error);
     }
 };
+
+//must have the same name put in the URL
+interface UpdateNoteParams {
+    noteId: string
+}
+
+//title and text can be optional
+interface UpdateNoteBody {
+    title?: string,
+    text?: string
+}
+
+export const updateNote: RequestHandler<UpdateNoteParams, unknown, UpdateNoteBody, unknown> = async(req, res, next) => {
+    const noteId = req.params.noteId;
+    const newTitle = req.body.title;
+    const newText = req.body.text;
+
+    try {
+        if (!mongoose.isValidObjectId(noteId)) {
+            throw createHttpError(400, "Invalid note id");
+        }
+
+        if (!newTitle) {
+            throw createHttpError(400, "Note must have a title");
+        }
+
+        const note = await NoteModel.findById(noteId).exec();
+
+        if (!note) {
+            throw createHttpError(404, "Note not found");
+        }
+
+        //set the new values to the note after checks
+        note.title = newTitle;
+        note.text = newText;
+        
+        //return the updated and saved note back to the user
+        const updatedNote = await note.save();
+
+        res.status(200).json(updatedNote);
+        
+        //another approach is NoteModel.findByIdAndUpdate()
+        //the problem is that you will need to lookup the note again after
+    } catch(error) {
+        next(error);
+    }
+}

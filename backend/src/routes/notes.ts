@@ -13,4 +13,7 @@ router.get("/:noteId", NotesController.getNote);
 //possible same address as they have different HTTP requests
 router.post("/", NotesController.createNote);
 
+//patch partially updates while put replaces the entire resource
+router.patch("/:noteId", NotesController.updateNote);
+
 export default router;
