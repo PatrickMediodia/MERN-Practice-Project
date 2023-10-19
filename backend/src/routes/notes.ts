@@ -13,6 +13,4 @@ router.get("/:noteId", NotesController.getNote);
 //possible same address as they have different HTTP requests
 router.post("/", NotesController.createNote);
 
-
-
 export default router;
