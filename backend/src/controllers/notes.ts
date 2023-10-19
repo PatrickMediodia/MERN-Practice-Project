@@ -105,12 +105,39 @@ export const updateNote: RequestHandler<UpdateNoteParams, unknown, UpdateNoteBod
         
         //return the updated and saved note back to the user
         const updatedNote = await note.save();
-
-        res.status(200).json(updatedNote);
         
+        res.status(200).json(updatedNote);
+
         //another approach is NoteModel.findByIdAndUpdate()
         //the problem is that you will need to lookup the note again after
     } catch(error) {
         next(error);
     }
 }
+
+export const deleteNote: RequestHandler = async(req, res, next) => {
+    const noteId = req.params.noteId;
+    
+    try {
+        if (!mongoose.isValidObjectId(noteId)) {
+            throw createHttpError(400, "Invalid note id");
+        }
+
+        const note = await NoteModel.findById(noteId).exec();
+
+        if (!note) {
+            throw createHttpError(404, "Note not found");
+        }
+        
+        //remove can no longer be used
+        //see https://stackoverflow.com/questions/75689772/error-ts2339-property-remove-does-not-exist-on-type-documentunknown
+        await note.deleteOne();
+        
+        //204 means deletion successful
+        //status does not send a response, it is json the one sending
+        //to send a status, use the sendStatus method
+        res.sendStatus(204);
+    } catch(error) {
+        next(error)
+    }
+};
