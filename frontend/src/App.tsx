@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import './styles/global.css';
 import { Button } from 'react-bootstrap';
-import { Note } from './models/note';
+import { Note as NoteModel } from './models/note';
+import Note from './components/Note';
 
 function App() {
   //[variable, function to change this variable], array destructuring
   //set initial clickCount state to empty list
   //always do this before the return function
-  const[notes, setNotes] = useState<Note[]>([]);
+  const[notes, setNotes] = useState<NoteModel[]>([]);
 
   //execute side effects outside of rendering
   useEffect(() => {
@@ -34,15 +35,19 @@ function App() {
     }
 
     loadNotes();
-    
+
     //make sure to pass a dependency array
     //in this case it will only run once
     //if you put variable to check here and hte variable value changes, it will trigger this useEffect
   }, []);
 
   return (
-    <div className="App">
-      {JSON.stringify(notes)}
+    <div>
+      {
+        notes.map(note=> (
+          <Note note={note} key={note._id} />
+        ))
+      }
     </div>
   );
 }

@@ -1,0 +1,8 @@
+.noteCard {
+    background-color: cornsilk;
+}
+
+.cardText {
+    /* to keep formatting like next line */
+    white-space: pre-line;
+}
