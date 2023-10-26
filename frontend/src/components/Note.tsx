@@ -1,12 +1,14 @@
 //css module specific to note
 import styles from "../styles/Note.module.css";
+import styleUtils from "../styles/utils.module.css";
 import { Card, CardFooter } from "react-bootstrap";
 import { Note as NoteModel } from "../models/note";
-import { create } from "domain";
 import { formateDate } from "../utils/formatDate";
+import { MdDelete } from "react-icons/md";
 
 interface NoteProps {
     note : NoteModel,
+    onDeleteNoteClicked : (note: NoteModel) => void,
     className?: string,
 }
 
@@ -15,7 +17,7 @@ interface NoteProps {
 //this function accepts an argument of type NoteProps and destructure into a note
 
 //whenever an argument in a component changes, it is like a state that when changed, the UI is going to rerender
-const Note = ({ note, className } : NoteProps) => {
+const Note = ({ note, onDeleteNoteClicked, className } : NoteProps) => {
     //destructure note
     const { 
         _id, 
@@ -38,8 +40,15 @@ const Note = ({ note, className } : NoteProps) => {
     return (
         <Card className={`${styles.noteCard} ${className}`}>
             <Card.Body className={styles.cardBody}>
-                <Card.Title>
+                <Card.Title className={styleUtils.flexCenter}>
                     { title }
+                    <MdDelete 
+                        className="text-muted ms-auto"
+                        onClick={(e) => {
+                            onDeleteNoteClicked(note);
+                            e.stopPropagation();
+                        }}
+                    />
                 </Card.Title>
                 <Card.Text className={styles.cardText}>
                     { text }

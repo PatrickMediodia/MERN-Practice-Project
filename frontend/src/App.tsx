@@ -7,7 +7,7 @@ import styles from "./styles/NotesPage.module.css";
 import styleUtils from "./styles/utils.module.css";
 import * as NotesAPI from './network/notes_api';
 import AddNoteDialog from './components/AddNoteDialog';
-
+import { FaPlus } from "react-icons/fa"
 function App() {
   //[variable, function to change this variable], array destructuring
   //set initial clickCount state to empty list
@@ -41,13 +41,27 @@ function App() {
     //make sure to pass a dependency array
     //in this case it will only run once
     //if you put variable to check here and hte variable value changes, it will trigger this useEffect
-  }, []);
+  }, []); 
+
+  async function deleteNote(note: NoteModel) {
+    try {
+      //call the delete function in network notes_api
+      await NotesAPI.deleteNote(note._id);
+      
+      //filter the notes to check if id of note is id to not include
+      setNotes(notes.filter(existingNote => existingNote._id !== note._id));
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
+  }
 
   return (
     <Container>
       <Button
-        className={`mb-4 ${styleUtils.blockCenter}`}
+        className={`mb-4 ${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
         onClick={()=> setShowAddNoteDialog(true)} >
+        <FaPlus />
         Add new note
       </Button>
 
@@ -55,7 +69,11 @@ function App() {
         {
           notes.map(note=> (
             <Col key={note._id}>
-              <Note note={note}  className={styles.note}/>
+              <Note 
+                note={note}  
+                className={styles.note}
+                onDeleteNoteClicked={deleteNote}
+              />
             </Col>
           ))
         }

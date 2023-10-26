@@ -36,14 +36,24 @@ export interface NoteInput {
 
 export async function createNote(note: NoteInput): Promise<Note> {
     // headers tell the backend what format our body is
-    const response = await fetchData("/api/notes", 
-    { 
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(note),
-    });
+    const response = await fetchData(
+        "/api/notes", 
+        { 
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(note),
+        }
+    );
 
     return response.json();
+}
+
+export async function deleteNote(noteId: string) {
+    // headers tell the backend what format our body is
+    await fetchData(
+        "/api/notes/" + noteId,
+        { method: "DELETE" },
+    );
 }
