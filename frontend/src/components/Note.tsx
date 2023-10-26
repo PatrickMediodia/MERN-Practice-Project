@@ -8,6 +8,7 @@ import { MdDelete } from "react-icons/md";
 
 interface NoteProps {
     note : NoteModel,
+    onNoteClicked : (note: NoteModel) => void,
     onDeleteNoteClicked : (note: NoteModel) => void,
     className?: string,
 }
@@ -17,16 +18,15 @@ interface NoteProps {
 //this function accepts an argument of type NoteProps and destructure into a note
 
 //whenever an argument in a component changes, it is like a state that when changed, the UI is going to rerender
-const Note = ({ note, onDeleteNoteClicked, className } : NoteProps) => {
+const Note = ({ note, onNoteClicked, onDeleteNoteClicked, className } : NoteProps) => {
     //destructure note
-    const { 
-        _id, 
+    const {
         title, 
         text,
         createdAt,
         updatedAt
     } = note;
-    
+
     //use utils function to format date
     //this function is ran on every re-render
     //its ok becase this is cheap
@@ -38,7 +38,10 @@ const Note = ({ note, onDeleteNoteClicked, className } : NoteProps) => {
     }
 
     return (
-        <Card className={`${styles.noteCard} ${className}`}>
+        <Card 
+            className={`${styles.noteCard} ${className}`}
+            onClick={()=> onNoteClicked(note)}
+        >
             <Card.Body className={styles.cardBody}>
                 <Card.Title className={styleUtils.flexCenter}>
                     { title }

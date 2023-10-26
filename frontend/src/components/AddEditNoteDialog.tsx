@@ -4,12 +4,13 @@ import { useForm } from "react-hook-form";
 import { NoteInput } from "../network/notes_api";
 import * as NotesAPI from "../network/notes_api";
 
-interface AddNoteDialogProps {
+interface AddEditNoteDialogProps {
+    noteToEdit?: Note,
     onDismiss: () => void,
     onNoteSaved: (note : Note) => void,
 }
 
-const AddNoteDialog = ({ onDismiss, onNoteSaved } : AddNoteDialogProps) => {
+const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved } : AddEditNoteDialogProps) => {
 
     const {
         register,
@@ -18,14 +19,31 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved } : AddNoteDialogProps) => {
             errors,
             isSubmitting,
         }
-    } = useForm<NoteInput>();
+    } = useForm<NoteInput>({
+        // set default values
+        // if noteToEdit is not undefined, it will use those values
+        defaultValues : {
+            title: noteToEdit?.title || "",
+            text: noteToEdit?.text || "",
+        }
+    });
 
     async function onSubmit(input: NoteInput) {
         try {
-            //call the Notes API create methode
-            const noteResponse = await NotesAPI.createNote(input);
+            let noteResponse: Note;
 
-            //save the rresponse of the new note to add it to the UI
+            //check if noteToEdit has been passed as props and is not undefined
+            //if not undefined, you know it is update note
+            if (noteToEdit) {
+                noteResponse = await NotesAPI.updatedNote(noteToEdit._id, input);
+
+            //if undefined, you know it is a create note
+            } else {
+                //call the Notes API create method
+                noteResponse = await NotesAPI.createNote(input);
+            }
+
+            //save the response of the new note to add it to the UI
             onNoteSaved(noteResponse);
         } catch (error) {
             console.error(error);
@@ -40,12 +58,12 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved } : AddNoteDialogProps) => {
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    Add Note
+                    { noteToEdit ? "Update" : "Add" } Note
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
 
-                <Form id="addNoteForm" onSubmit={handleSubmit(onSubmit)}>
+                <Form id="addEditNoteForm" onSubmit={handleSubmit(onSubmit)}>
                     <Form.Group className="mb-3">
                         <Form.Label>Title</Form.Label>
                         <Form.Control
@@ -81,7 +99,7 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved } : AddNoteDialogProps) => {
                     /* since it is not in the form it is not connected by default */
                     /* set the form property to the id of the form*/
 
-                    form="addNoteForm"
+                    form="addEditNoteForm"
 
                     /* disable the button if the form is submitting */
                     disabled={isSubmitting}
@@ -92,5 +110,5 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved } : AddNoteDialogProps) => {
         </Modal>
     );
 }
- 
-export default AddNoteDialog;
+
+export default AddEditNoteDialog;

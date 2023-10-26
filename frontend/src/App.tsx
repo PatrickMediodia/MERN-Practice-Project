@@ -6,8 +6,9 @@ import Note from './components/Note';
 import styles from "./styles/NotesPage.module.css";
 import styleUtils from "./styles/utils.module.css";
 import * as NotesAPI from './network/notes_api';
-import AddNoteDialog from './components/AddNoteDialog';
+import AddEditNoteDialog from './components/AddEditNoteDialog';
 import { FaPlus } from "react-icons/fa"
+
 function App() {
   //[variable, function to change this variable], array destructuring
   //set initial clickCount state to empty list
@@ -16,6 +17,9 @@ function App() {
 
   //state so that we know if we should show or hide the modal
   const[showAddNoteDialog, setShowAddNoteDialog] = useState<boolean>(false);
+
+  //keeps track of which note to edit when clicked
+  const[noteToEdit, setNoteToEdit] = useState<NoteModel|null>(null);
 
   //execute side effects outside of rendering
   useEffect(() => {
@@ -70,7 +74,8 @@ function App() {
           notes.map(note=> (
             <Col key={note._id}>
               <Note 
-                note={note}  
+                note={note} 
+                onNoteClicked={setNoteToEdit} 
                 className={styles.note}
                 onDeleteNoteClicked={deleteNote}
               />
@@ -86,18 +91,38 @@ function App() {
         //in the current configuration it will clear the state altogether
 
         showAddNoteDialog && 
-        <AddNoteDialog 
-          onDismiss={ ()=> setShowAddNoteDialog(false) }
-          onNoteSaved={ (newNote) => {
-            /* ...notes is the spread function */
-            setNotes([...notes, newNote]);
-            setShowAddNoteDialog(false);
-          } }
-        />
+          <AddEditNoteDialog 
+            onDismiss={ ()=> setShowAddNoteDialog(false) }
+            onNoteSaved={ (newNote) => {
+                /* ...notes is the spread function */
+                setNotes([...notes, newNote]);
+                setShowAddNoteDialog(false);
+              }
+            }
+          />
         
         //onDismiss as a prop drills down the setShowAddNoteDialog to be executed onHide
       }
 
+      {
+        noteToEdit &&
+          <AddEditNoteDialog
+            onDismiss={ ()=> setNoteToEdit(null) }
+            noteToEdit={noteToEdit}
+            onNoteSaved={ (updatedNote) => {
+                /* check if note is the same id as updated note, if same, use the updated note instead */
+                setNotes(
+                  notes.map(note =>
+                    note._id === updatedNote._id 
+                      ? updatedNote
+                      : note
+                  )
+                );
+                setNoteToEdit(null);
+              }
+            }
+        />
+      }
     </Container>
   );
 }
