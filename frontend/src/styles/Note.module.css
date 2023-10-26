@@ -6,3 +6,10 @@
     /* to keep formatting like next line */
     white-space: pre-line;
 }
+
+/* Adds gradient effect when the text is too long for the card body */
+.cardBody {
+    /* Hides text that is greater than the body */
+    overflow: hidden;
+    mask-image: linear-gradient(180deg, #000 60%, transparent);
+}

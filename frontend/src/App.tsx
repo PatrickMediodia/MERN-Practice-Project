@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './styles/global.css';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { Note as NoteModel } from './models/note';
 import Note from './components/Note';
+import styles from "./styles/NotesPage.module.css";
 
 function App() {
   //[variable, function to change this variable], array destructuring
@@ -42,13 +43,17 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <Container>
+      <Row xs={1} md={2} xl={3} className="g-4">
       {
         notes.map(note=> (
-          <Note note={note} key={note._id} />
+          <Col key={note._id}>
+            <Note note={note}  className={styles.note}/>
+          </Col>
         ))
       }
-    </div>
+      </Row>
+    </Container>
   );
 }
 
